@@ -22,32 +22,49 @@ async function run() {
         const x = Math.floor((event.clientX - rect.left) / cellSize);
         const y = Math.floor((event.clientY - rect.top) / cellSize);
         grid.set(new Vector2(x, y), Element.sand());
+        grid.set(new Vector2(x+1, y), Element.sand());
+        grid.set(new Vector2(x+1, y+1), Element.sand());
+        grid.set(new Vector2(x, y+1), Element.sand());
+        grid.set(new Vector2(x-1, y), Element.sand());
+        grid.set(new Vector2(x-1, y-1), Element.sand());
+        grid.set(new Vector2(x, y-1), Element.sand());
     });
+    // grid.render(ctx);
+
 
     function update() {
-
-
-        grid.update();
-
-    
-
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        for (let y = 0; y < gridHeight; y++) {
-            for (let x = 0; x < gridWidth; x++) {
-                const element = grid.get(new Vector2(x, y));
-                // console.log(`${element.to_string()}`)
-                const color = element.get_color();
-                ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
-        }
-
+        grid.render(ctx, 5);
         requestAnimationFrame(update);
     }
 
     update();
+
+
+    // function update() {
+
+
+    //     grid.update();
+
+    
+
+    //     ctx.fillStyle = 'black';
+    //     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    //     for (let y = 0; y < gridHeight; y++) {
+    //         for (let x = 0; x < gridWidth; x++) {
+    //             const element = grid.get(new Vector2(x, y));
+    //             // console.log(`${element.to_string()}`)
+    //             const color = element.get_color();
+    //             ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+    //             ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    //         }
+    //     }
+
+    //     requestAnimationFrame(update);
+    // }
+
+    // update();
 }
 
-document.addEventListener("DOMContentLoaded", run);
+// document.addEventListener("DOMContentLoaded", run);
+run();
