@@ -17,6 +17,8 @@ pub enum ElementType {
     Magic,
     Fire,
     Maze,
+    Faucet,
+    Drain,
 }
 #[derive(Clone, Copy, PartialEq)]
 #[wasm_bindgen]
@@ -58,6 +60,8 @@ impl Element {
             ElementType::Magic => self.step_magic(grid, x, y),
             ElementType::Fire => self.step_fire(grid, x, y),
             ElementType::Maze => self.step_maze(grid, x, y),
+            ElementType::Faucet => self.step_pixel_generator(grid, x, y),
+            ElementType::Drain => self.step_drain(grid, x, y),
             _ => {}
         }
     }
@@ -186,6 +190,15 @@ impl Element {
         // Check if there is air below
         if y + 1 < grid.height && grid.get(x, y + 1).element_type == ElementType::Nothing {
             grid.set(x, y + 1, WATER);
+        }
+    }
+    fn step_drain(&mut self, grid: &mut Grid, x: usize, y: usize){
+        //turn adjacent liquids into nothing
+        let adj = [(1,1),(0,1),(-1,1),(1,0),(-1,0),(1,-1),(0,-1),(-1,-1)];
+        for (l,r) in adj {
+            if grid.get((x as isize + l) as usize,(y as isize + r) as usize).element_type == ElementType::Liquid{
+                grid.set((x as isize + l) as usize,(y as isize + r) as usize, NOTHING);
+            }
         }
     }
 
@@ -360,5 +373,27 @@ pub static MAZE: Element = Element {
         b: 255.0,
     },
     name: "Maze",
+    velocity_x: 0,
+};
+
+pub static FAUCET: Element = Element {
+    element_type: ElementType::Faucet,
+    color: Color {
+        r: 150.0,
+        g: 150.0,
+        b: 150.0,
+    },
+    name: "Faucet",
+    velocity_x: 0,
+};
+
+pub static DRAIN: Element = Element {
+    element_type: ElementType::Drain,
+    color: Color {
+        r: 50.0,
+        g: 50.0,
+        b: 50.0,
+    },
+    name: "Drain",
     velocity_x: 0,
 };
