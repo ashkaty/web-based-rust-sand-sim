@@ -21,6 +21,10 @@ async function run() {
 
     canvas.addEventListener('mousedown', (event) => {
         mouse_down = true;
+        const rect = canvas.getBoundingClientRect();
+        mouse_pos_x = Math.floor((event.clientX - rect.left) / cellSize);
+        mouse_pos_y = Math.floor((event.clientY - rect.top) / cellSize);
+        grid.set_mouse(mouse_pos_x, mouse_pos_y);
     });
     canvas.addEventListener('mousemove', (event) => {
         const rect = canvas.getBoundingClientRect();
@@ -28,14 +32,13 @@ async function run() {
         mouse_pos_y = Math.floor((event.clientY - rect.top) / cellSize);
     });
     canvas.addEventListener('mouseup', () => {
-        console.log("mosueup")
         mouse_down = false;
     });
 
 
     function update() {
         if (mouse_down) {
-            grid.draw_mouse(ctx, mouse_pos_x, mouse_pos_y);
+            grid.draw_mouse(mouse_pos_x, mouse_pos_y);
         }
         grid.render(ctx, 5);
         requestAnimationFrame(update);

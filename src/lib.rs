@@ -40,7 +40,9 @@ pub struct Grid {
     width: usize,
     height: usize,
     elements: Vec<element::Element>,
-    selected_element: element::Element
+    selected_element: element::Element,
+    previous_mouse_x: usize,
+    previous_mouse_y: usize
 }
 
 
@@ -55,7 +57,9 @@ impl Grid {
             width,
             height,
             elements: vec![element::NOTHING; width * height],
-            selected_element: element::Element::water()
+            selected_element: element::Element::water(),
+            previous_mouse_x: 0,
+            previous_mouse_y: 0
         }
     }
     // Get the element at the given position
@@ -137,6 +141,30 @@ impl Grid {
     //     }
     // }
 
+    fn draw_line(&self, x0: isize, y0: isize, x1: isize, y1: isize) -> Vec<(isize, isize)> {
+        let mut points = Vec::new();
+        let mut x = x0;
+        let mut y = y0;
+        let dx = (x1 - x0).abs();
+        let dy = -(y1 - y0).abs();
+        let sx = if x0 < x1 { 1 } else { -1 };
+        let sy = if y0 < y1 { 1 } else { -1 };
+        let mut err = dx + dy;  // error value e_xy
+        loop {
+            points.push((x, y)); // Collect the current point
+            if x == x1 && y == y1 { break; }
+            let e2 = 2 * err;
+            if e2 >= dy { 
+                err += dy;
+                x += sx;
+            }
+            if e2 <= dx { 
+                err += dx; 
+                y += sy; 
+            }
+        }
+        points
+    }
 
     pub fn is_within_bounds(&self, pos: Vector2) -> bool {
         pos.x < self.width && pos.y < self.height
@@ -161,7 +189,14 @@ impl Grid {
     }
 
     #[wasm_bindgen]
-    pub fn draw_mouse(& mut self, ctx: &CanvasRenderingContext2d, mouse_pos_x: usize, mouse_pos_y: usize) {       
+    pub fn set_mouse(&mut self, mouse_pos_x:usize, mouse_pos_y:usize){
+        self.previous_mouse_x = mouse_pos_x;
+        self.previous_mouse_y = mouse_pos_y;
+    }
+
+
+    #[wasm_bindgen]
+    pub fn draw_mouse(& mut self, mouse_pos_x: usize, mouse_pos_y: usize) {       
         // const brush_offsets: [(isize, isize); 7] = [
         //     (0, 0),
         //     (1, 0),
@@ -172,6 +207,8 @@ impl Grid {
         //     (0, -1),
         // ];
 
+        let pointsss = self.draw_line(self.previous_mouse_x as isize, self.previous_mouse_y as isize, mouse_pos_x as isize, mouse_pos_y as isize);
+
         let brush_offsets: [(isize, isize); 21] = [
             (-2, 0), (-2, 1), (-2, -1),           // Three points to the left
             (-1, 2), (-1, 1), (-1, 0), (-1, -1), (-1, -2), // Five points diagonally left
@@ -180,10 +217,18 @@ impl Grid {
             (2, 0), (2, 1), (2, -1),              // Three points to the right
             (0,0),                                  // fill center
         ];
-        for offset in brush_offsets.iter() {
-            let new_x = (mouse_pos_x as isize + offset.0) as usize;
-            let new_y = (mouse_pos_y as isize + offset.1) as usize;
-            self.set(Vector2 { x: new_x, y: new_y }, self.selected_element);
+        for point in pointsss{
+            let x1 = point.0;
+            let y1 = point.1;
+            for offset in brush_offsets.iter() {
+                let new_x = (x1 as isize + offset.0) as usize;
+                let new_y = (y1 as isize + offset.1) as usize;
+                self.set(Vector2 { x: new_x, y: new_y }, self.selected_element);
+            }
         }
+        self.previous_mouse_x = mouse_pos_x;
+        self.previous_mouse_y = mouse_pos_y;
+
+
     }
 }
