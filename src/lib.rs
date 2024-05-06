@@ -177,7 +177,8 @@ impl Grid {
             (-1, 2), (-1, 1), (-1, 0), (-1, -1), (-1, -2), // Five points diagonally left
             (0, 2), (0, 1), (0, -1), (0, -2),     // Middle vertical
             (1, 2), (1, 1), (1, 0), (1, -1), (1, -2),     // Five points diagonally right
-            (2, 0), (2, 1), (2, -1)              // Three points to the right
+            (2, 0), (2, 1), (2, -1),              // Three points to the right
+            (0,0),                                  // fill center
         ];
         for offset in brush_offsets.iter() {
             let new_x = (mouse_pos_x as isize + offset.0) as usize;
