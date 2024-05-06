@@ -140,42 +140,13 @@ impl Grid {
         pos.x < self.width && pos.y < self.height
     }
 
-
     pub fn reset(&mut self) {
         self.elements = vec![element::NOTHING; self.width * self.height];
     }
 
-    // #[wasm_bindgen]
-    // pub fn render(&self, context: CanvasRenderingContext2d) {
-    //     for y in 0..self.height {
-    //         for x in 0..self.width {
-    //         let elem:Element = self.get(Vector2{x, y});
-    //         //shit I need to convert color to hex string...
-    //         // console.log(`${element.to_string()}`)
-    //         // const color:Color = elem.get_color();
-    //         if elem == WATER{
-    //             context.set_fill_style(&JsValue::from_str("#0000FF")); // all blue
-    //             context.fill_rect((x * 5) as f64, (y * 5) as f64, 5.0, 5.0);
-    //         }
-    //         else {
-    //             context.set_fill_style(&JsValue::from_str("FF00FF")); // all white
-    //             context.fill_rect((x * 5) as f64, (y * 5) as f64, 5.0, 5.0);
-    //         }
-        
-    //     }
-    // }
-    // }
-
     #[wasm_bindgen]
     pub fn render(&mut self, context: &CanvasRenderingContext2d, cell_size: f64) {
-        // let context = canvas
-        //     .get_context("2d")
-        //     .unwrap()
-        //     .unwrap()
-        //     .dyn_into::<CanvasRenderingContext2d>()
-        //     .unwrap();
         self.update();
-
         for y in 0..self.height {
             for x in 0..self.width {
                 let element = self.get(Vector2{x, y});
@@ -185,10 +156,18 @@ impl Grid {
                 context.fill_rect((x as f64) * cell_size, (y as f64) * cell_size, cell_size, cell_size);
             }
         }
-
-        // To continuously update the canvas, you might want to set up an animation frame loop in JavaScript
-        // and call this Rust function repeatedly.
     }
 
-
+    #[wasm_bindgen]
+    pub fn draw_mouse(& mut self, ctx: &CanvasRenderingContext2d, mouse_down: bool, mouse_pos_x: usize, mouse_pos_y: usize) {
+        if mouse_down {
+            self.set(Vector2{x: mouse_pos_x, y: mouse_pos_y}, Element::sand());
+        }
+        // self.set(Vector2{mouse_pos_x+1, mouse_pos_y}, Element.sand());
+        // self.set(Vector2{mouse_pos_x+1, mouse_pos_y+1}, Element.sand());
+        // self.set(Vector2{mouse_pos_x, mouse_pos_y+1}, Element.sand());
+        // self.set(Vector2{mouse_pos_x-1, mouse_pos_y}, Element.sand());
+        // self.set(Vector2{mouse_pos_x-1, mouse_pos_y-1}, Element.sand());
+        // self.set(Vector2{mouse_pos_x, mouse_pos_y-1}, Element.sand());
+    }
 }
