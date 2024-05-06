@@ -229,9 +229,7 @@ impl Grid {
                     self.brush_size += 1;
                 }
             }
-            // "z" => {
-            //     self = &mut Grid::new(self.width, self.height);
-            // }
+            "z" => self.reset(),
             _ => {self.selected_element = element::STONE}
         }
     }
