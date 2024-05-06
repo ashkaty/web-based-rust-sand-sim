@@ -1,6 +1,4 @@
 use wasm_bindgen::prelude::wasm_bindgen;
-
-
 use crate::element_type::{
     step_gas, step_immoveable_solid, step_liquid, step_moveable_solid, step_pixel_generator,
     ElementType,
@@ -16,18 +14,13 @@ pub struct Color {
     pub g: f32,
     pub b: f32,
 }
-
-
-
-
-
 #[derive(Clone, Copy, PartialEq)]
-
 #[wasm_bindgen]
 pub struct Element {
     pub element_type: ElementType,
     pub color: Color,
     name: &'static str,
+    pub velocity: Vector2, // Add velocity field
 }
 
 #[wasm_bindgen]
@@ -38,6 +31,7 @@ impl Element {
             element_type,
             color: (color),
             name,
+            velocity: Vector2{x: 0, y: 0},
         }
     }
 
@@ -84,40 +78,47 @@ pub static AIR: Element = Element {
     element_type: ElementType::Gas,
     color: Color{ r: 135.0, g: 206.0, b: 235.0 },
     name: "Air",
+    velocity: Vector2{x: 0, y: 0},
 };
 
 pub static SAND: Element = Element {
     element_type: ElementType::MoveableSolid,
     color: Color { r: 255.0, g: 215.0, b: 0.0 },
     name: "Sand",
+    velocity: Vector2{x: 0, y: 0},
 };
 
 pub static WATER: Element = Element {
     element_type: ElementType::Liquid,
     color: Color { r: 4.0, g: 59.0, b: 92.0 },
     name: "Water",
+    velocity: Vector2{x: 0, y: 0},
 };
 
 pub static STONE: Element = Element {
     element_type: ElementType::ImmovableSolid,
     color: Color { r: 169.0, g: 169.0, b: 169.0 },
     name: "Stone",
+    velocity: Vector2{x: 0, y: 0},
 };
 
 pub static FAUCET: Element = Element {
     element_type: ElementType::PixelGenerator,
     color: Color { r: 255.0, g: 255.0, b: 255.0 },
     name: "Faucet",
+    velocity: Vector2{x: 0, y: 0},
 };
 
 pub static CLAY: Element = Element {
     element_type: ElementType::MoveableSolid,
     color: Color { r: 165.0, g: 42.0, b: 42.0 },
     name: "Clay",
+    velocity: Vector2{x: 0, y: 0},
 };
 
 pub static NOTHING: Element = Element {
     element_type: ElementType::Nothing,
     color: Color{ r: 0.0, g: 0.0, b: 0.0 },
     name: "Nothing",
+    velocity: Vector2{x: 0, y: 0},
 };
