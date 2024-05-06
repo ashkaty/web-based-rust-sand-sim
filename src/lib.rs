@@ -3,21 +3,13 @@ use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::CanvasRenderingContext2d;
-
-
-
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::console;
 mod element;
 mod element_type;
 
-
-
 pub const GRID_WIDTH: usize = 226;
 pub const GRID_HEIGHT: usize = 126;
-
-
-
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq)]
 pub struct Vector2 {
@@ -35,7 +27,6 @@ impl Vector2 {
 }
 
 #[wasm_bindgen]
-
 pub struct Grid {
     width: usize,
     height: usize,
@@ -47,7 +38,6 @@ pub struct Grid {
 
 
 #[wasm_bindgen]
-
 impl Grid {
     // Create a new grid with the given width and height
 
@@ -114,32 +104,6 @@ impl Grid {
             }
         }
     }
-
-
-
-    // Apply the function to each element in between two positions
-
-    // pub fn traverse_line<F>(&mut self, start: Vector2, end: Vector2, mut f: F)
-    // where
-    //     F: FnMut(usize, usize),
-    // {
-    //     let dx = end.0 as isize - start.0 as isize;
-    //     let dy = end.1 as isize - start.1 as isize;
-    //     let steps = if dx.abs() > dy.abs() {
-    //         dx.abs()
-    //     } else {
-    //         dy.abs()
-    //     } as f32;
-    //     let x_increment = dx as f32 / steps;
-    //     let y_increment = dy as f32 / steps;
-    //     let mut x = start.0 as f32;
-    //     let mut y = start.1 as f32;
-    //     for _ in 0..steps as usize {
-    //         f(x as usize, y as usize);
-    //         x += x_increment;
-    //         y += y_increment;
-    //     }
-    // }
 
     fn draw_line(&self, x0: isize, y0: isize, x1: isize, y1: isize) -> Vec<(isize, isize)> {
         let mut points = Vec::new();
@@ -236,5 +200,16 @@ impl Grid {
     pub fn update_selected_element(& mut self, e:Element){
         self.selected_element = e;
     }
+
+    #[wasm_bindgen]
+    pub fn handle_input(&mut self, gk:&str){
+        match gk {
+            "q" => self.selected_element = element::SAND,
+            "w" => self.selected_element = element::WATER,
+            "e" => self.selected_element = element::STONE,
+            _ => {}
+        }
+    }
+
 }
 

@@ -35,12 +35,7 @@ async function run() {
         mouse_down = false;
     });
     canvas.addEventListener('keydown', function(event) {
-        if (event.key === 'q'){
-            grid.update_selected_element(Element.sand());
-        }
-        else if (event.key === 'w'){
-            grid.update_selected_element(Element.water());
-        }
+        grid.handle_input(event.key);
     });
 
 
