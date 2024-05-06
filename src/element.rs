@@ -16,6 +16,7 @@ pub enum ElementType {
     PixelGenerator,
     Nothing,
     Magic,
+    Fire
 }
 #[derive(Clone, Copy, PartialEq)]
 #[wasm_bindgen]
@@ -56,6 +57,7 @@ impl Element {
             ElementType::Gas => self.step_gas(grid,x, y),
             ElementType::PixelGenerator => self.step_pixel_generator(grid,x, y),
             ElementType::Magic => self.step_magic(grid,x,y),
+            ElementType::Fire => self.step_fire(grid,x,y),
             _ => {}
         }
     }
@@ -168,6 +170,32 @@ impl Element {
             grid.set (x, y + 1, WATER);
         }
     }
+
+    pub fn step_fire(&mut self, grid: &mut Grid, x: usize, y: usize) {
+        let mut rng = thread_rng();
+        let upward_chance = 0.7;
+    
+        // Check if the pixel above is empty and within grid bounds
+        if y > 0 && grid.get(x, y - 1) == NOTHING {
+            // Move upward with a chance based on upward_chance
+            if rng.gen::<f32>() < upward_chance {
+                grid.move_element(x, y, x, y - 1);
+                return; // Fire moves only once per step
+            }
+        }
+    
+        // If no upward movement occurred, the fire drifts randomly
+        let drift_direction = rng.gen_range(-1..=1); // -1 for left, 0 for no drift, 1 for right
+        let new_x = (x as i32 + drift_direction) as usize;
+    
+        // Check if the new position is within grid bounds and empty
+        if new_x < grid.width && grid.get(new_x, y) == NOTHING {
+            grid.move_element(x, y, new_x, y);
+        } else {
+            // If no movement is possible, the fire dies out, turning into NOTHING
+            grid.set(x, y, NOTHING);
+        }
+    }
 }
 
 pub static SAND: Element = Element {
@@ -202,5 +230,12 @@ pub static MAGIC: Element = Element {
     element_type: ElementType::Magic,
     color: Color { r: 0.0, g: 255.0, b: 0.0 },
     name: "Magic",
+    velocity_x: 0,
+};
+
+pub static FIRE: Element = Element {
+    element_type: ElementType::Fire,
+    color: Color { r: 255.0, g: 0.0, b: 0.0 },
+    name: "Fire",
     velocity_x: 0,
 };

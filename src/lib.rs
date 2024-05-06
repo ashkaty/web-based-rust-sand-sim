@@ -218,6 +218,7 @@ impl Grid {
             "e" => self.selected_element = element::STONE,
             "r" => self.selected_element = element::MAGIC,
             "t" => self.selected_element = element::NOTHING,
+            "y" => self.selected_element = element::FIRE,
             "[" => {
                 if self.brush_size > 1 {
                     self.brush_size -= 1;
