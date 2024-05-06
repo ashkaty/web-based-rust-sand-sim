@@ -9,20 +9,20 @@ mod element;
 
 pub const GRID_WIDTH: usize = 226;
 pub const GRID_HEIGHT: usize = 126;
-#[wasm_bindgen]
-#[derive(Clone, Copy, PartialEq)]
-pub struct Vector2 {
-    pub x: usize,
-    pub y: usize,
-}
+// #[wasm_bindgen]
+// #[derive(Clone, Copy, PartialEq)]
+// pub struct Vector2 {
+//     pub x: usize,
+//     pub y: usize,
+// }
 
-#[wasm_bindgen]
-impl Vector2 {
-    #[wasm_bindgen(constructor)]
-    pub fn new(x: usize, y: usize) -> Vector2 {
-        Vector2 { x, y }
-    }
-}
+// #[wasm_bindgen]
+// impl Vector2 {
+//     #[wasm_bindgen(constructor)]
+//     pub fn new(x: usize, y: usize) -> Vector2 {
+//         Vector2 { x, y }
+//     }
+// }
 
 #[wasm_bindgen]
 pub struct Grid {
@@ -51,9 +51,9 @@ impl Grid {
         }
     }
     // Get the element at the given position
-    pub fn get(&self, pos: Vector2) -> element::Element {
-        if pos.x < self.width && pos.y < self.height {
-            self.elements[pos.y * self.width + pos.x]
+    pub fn get(&self, x: usize, y: usize) -> element::Element {
+        if x < self.width && y < self.height {
+            self.elements[y * self.width + x]
         } else {
             element::NOTHING
         }
@@ -64,33 +64,33 @@ impl Grid {
         console::log_1(&"Hello using web-sys".into()); 
     } 
 
-    pub fn set(&mut self, pos: Vector2, value: element::Element) {
-        if pos.x < self.width && pos.y < self.height {
-            self.elements[pos.y * self.width + pos.x] = value;
+    pub fn set(&mut self, x: usize, y: usize, value: element::Element) {
+        if x < self.width && y < self.height {
+            self.elements[y * self.width + x] = value;
         }
     }
 
     // Move the element at the given position to the new position   
-    pub fn move_element(&mut self, pos: Vector2, new_pos: Vector2) {
-        let element = self.get(pos);
-        self.set(pos, element::NOTHING);
-        self.set(new_pos, element);
+    pub fn move_element(&mut self, x: usize, y: usize, new_x:usize, new_y: usize ) {
+        let element = self.get(x, y);
+        self.set(x, y, element::NOTHING);
+        self.set(new_x,new_y, element);
     }
 
     // Swap the elements at the given positions
-    pub fn swap_elements(&mut self, pos: Vector2, new_pos: Vector2) {
-        let element1 = self.get(pos);
-        let element2 = self.get(new_pos);
-        self.set(pos, element2);
-        self.set(new_pos, element1);
+    pub fn swap_elements(&mut self, x: usize, y:usize, new_x:usize, new_y: usize ) {
+        let element1 = self.get(x, y);
+        let element2 = self.get(new_x, new_y);
+        self.set(x, y, element2);
+        self.set(new_x, new_y, element1);
     }
 
     // Update the grid
     pub fn update(&mut self) {
         for y in (0..self.height).rev() {
             for x in 0..self.width {
-                let mut element = self.get(Vector2 { x, y });
-                element.step(self, Vector2 { x, y });
+                let mut element = self.get( x, y );
+                element.step(self, x, y);
             }
         }
     }
@@ -120,8 +120,8 @@ impl Grid {
         points
     }
 
-    pub fn is_within_bounds(&self, pos: Vector2) -> bool {
-        pos.x < self.width && pos.y < self.height
+    pub fn is_within_bounds(&self, x:usize, y:usize) -> bool {
+        x < self.width && y < self.height
     }
 
     pub fn reset(&mut self) {
@@ -133,8 +133,8 @@ impl Grid {
         self.update();
         for y in 0..self.height {
             for x in 0..self.width {
-                let element = self.get(Vector2{x, y});
-                let color = element.get_color();
+                let element = self.get(x,y);
+                let color = element.color;
                 let color_string = format!("rgb({}, {}, {})", color.r, color.g, color.b);
                 context.set_fill_style(&JsValue::from_str(&color_string));
                 context.fill_rect((x as f64) * cell_size, (y as f64) * cell_size, cell_size, cell_size);
@@ -178,10 +178,10 @@ impl Grid {
             let x1 = point.0;
             let y1 = point.1;
             for offset in brush_offsets.iter() {
-                let new_x = (x1 as isize + offset.0) as usize;
+                let new_x:usize = (x1 + offset.0) as usize;
                 let new_y = (y1 as isize + offset.1) as usize;
-                if (self.get(Vector2{x: new_x, y: new_y}) == element::NOTHING){
-                    self.set(Vector2 { x: new_x, y: new_y }, self.selected_element);
+                if (self.get(new_x,new_y) == element::NOTHING){
+                    self.set(new_x, new_y, self.selected_element);
                 }
             }
         }

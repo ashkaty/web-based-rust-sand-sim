@@ -3,7 +3,6 @@ use std::path::Display;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::Grid;
-use crate::Vector2;
 use ::rand::{thread_rng, Rng};
 
 
@@ -30,7 +29,7 @@ pub struct Element {
     pub element_type: ElementType,
     pub color: Color,
     name: &'static str,
-    velocity_x: isize
+    velocity_x: isize,
 }
 
 #[wasm_bindgen]
@@ -41,93 +40,88 @@ impl Element {
     //         element_type,
     //         color: (color),
     //         name,
-    //         velocity_x: 0,
+    //         velocity_0,
     //     }
     // }
 
-    pub fn step(&mut self, grid: &mut Grid, pos: Vector2) {
-        if !grid.is_within_bounds(pos) {
+    pub fn step(&mut self, grid: &mut Grid, x:usize, y:usize) {
+        if !grid.is_within_bounds(x, y) {
             return;
         }
         match self.element_type {
-            ElementType::ImmovableSolid => self.step_immoveable_solid(grid, pos),
-            ElementType::MoveableSolid => self.step_moveable_solid(grid, pos),
-            ElementType::Liquid => self.step_liquid(grid, pos),
-            ElementType::Gas => self.step_gas(grid, pos),
-            ElementType::PixelGenerator => self.step_pixel_generator(grid, pos),
+            ElementType::ImmovableSolid => self.step_immoveable_solid(grid,x, y),
+            ElementType::MoveableSolid => self.step_moveable_solid(grid,x, y),
+            ElementType::Liquid => self.step_liquid(grid,x, y),
+            ElementType::Gas => self.step_gas(grid,x, y),
+            ElementType::PixelGenerator => self.step_pixel_generator(grid,x, y),
             _ => {}
         }
     }
 
-    pub fn to_string(&self) -> String {
-        self.name.to_string()
-    }
-
-    pub fn get_color(&self) -> Color {
-        return self.color;
-    }
-
-    pub fn get_element_type(&self) -> ElementType {
-        return self.element_type;
-    }
-
-    fn step_immoveable_solid(&self, grid: &mut Grid, _pos: Vector2) {
+    fn step_immoveable_solid(&self, grid: &mut Grid, _x:usize, y:usize) {
         // Immoveable solids don't move, no need for implementation here
     }
 
-    fn step_moveable_solid(&self, grid: &mut Grid, pos: Vector2) {
+    fn step_moveable_solid(&self, grid: &mut Grid, x:usize, y:usize) {
         // Check if there is space below or liquid to displace
-        if pos.y + 1 < grid.height && (grid.get(Vector2 { x: pos.x, y: pos.y + 1 }).element_type == ElementType::Nothing || grid.get(Vector2 { x: pos.x, y: pos.y + 1 }).element_type == ElementType::Liquid) {
-            grid.move_element(pos, Vector2 { x: pos.x, y: pos.y + 1 });
+        if y + 1 < grid.height && (grid.get(x, y + 1 ).element_type == ElementType::Nothing || grid.get(x, y + 1 ).element_type == ElementType::Liquid) {
+            grid.move_element( x,y,x, y + 1 );
         } else {
             // Random movement if no space below
             let mut options = Vec::new();
-
-            if pos.y + 1 < grid.height && pos.x > 0 && grid.get(Vector2 { x: pos.x - 1, y: pos.y + 1 }).element_type == ElementType::Nothing {
-                options.push(Vector2 { x: pos.x - 1, y: pos.y + 1 });
+            if y + 1 < grid.height && x > 0 && grid.get(x - 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x - 1, y + 1 ));
             }
-
-            if pos.y + 1 < grid.height && pos.x + 1 < grid.width && grid.get(Vector2 { x: pos.x + 1, y: pos.y + 1 }).element_type == ElementType::Nothing {
-                options.push(Vector2 { x: pos.x + 1, y: pos.y + 1 });
+            if y + 1 < grid.height && x + 1 < grid.width && grid.get(x + 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x + 1, y + 1 ));
             }
-
             if !options.is_empty() {
                 let random_index = thread_rng().gen_range(0..options.len());
                 let new_pos = options[random_index];
-                grid.move_element(pos, new_pos);
+                grid.move_element(x, y, new_pos.0, new_pos.1);
             }
         }
     }
 
-    fn step_liquid(&mut self, grid: &mut Grid, pos: Vector2) {
+    fn step_liquid(&mut self, grid: &mut Grid, x:usize, y:usize) {
         let mut rng = rand::thread_rng();
         let direction = rng.gen_range(0..2)*2 -1;
-        if pos.y + 1 < grid.height && grid.get(Vector2 { x: pos.x, y: pos.y + 1 }).element_type == ElementType::Nothing {
-            let target = Vector2{x: (pos.x as isize + direction) as usize, y: pos.y+1};
-            let target_element = grid.get(target);
-            if (target_element.element_type == ElementType::Nothing){
-                grid.move_element(pos, target);
+        if y + 1 < grid.height && grid.get(x, y + 1).element_type == ElementType::Nothing {
+            // Random movement if nothing below
+            let mut options = Vec::new();
+            if y + 1 < grid.height && x > 0 && grid.get(x - 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x - 1, y + 1 ));
+            }
+            if y + 1 < grid.height && x > 0 && grid.get(x + 1, y - 1 ).element_type == ElementType::Nothing {
+                options.push((x, y + 1 ));
+            }
+            if y + 1 < grid.height && x + 1 < grid.width && grid.get(x + 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x + 1, y + 1 ));
+            }
+            if !options.is_empty() {
+                let random_index = thread_rng().gen_range(0..options.len());
+                let new_pos = options[random_index];
+                grid.move_element(x, y, new_pos.0, new_pos.1);
             }
             else {
-                grid.move_element(pos, Vector2{x:pos.x,y:pos.y+1});
+                grid.move_element(x, y,x,y+1);
             }
         } else {
-            let target = Vector2{x: (pos.x as isize + direction) as usize, y: pos.y};
-            let target_element = grid.get(target);
+            let target_element = grid.get((x as isize + direction) as usize, y);
             if (target_element.element_type == ElementType::Nothing){
-                grid.move_element(pos, target);
+                grid.move_element(x, y, (x as isize + direction) as usize, y);
             }
         }
     }
 
-    fn step_gas(&mut self, grid: &mut Grid, pos: Vector2) {
+    fn step_gas(&mut self, grid: &mut Grid, x:usize, y:usize) {
         // Gas simulation logic
     }
 
-    fn step_pixel_generator(&self, grid: &mut Grid, pos: Vector2) {
+    fn step_pixel_generator(&self, grid: &mut Grid, x:usize, y:usize) {
         // Check if there is air below
-        if pos.y + 1 < grid.height && grid.get(Vector2 { x: pos.x, y: pos.y + 1 }).element_type == ElementType::Nothing {
-            grid.set(Vector2 { x: pos.x, y: pos.y + 1 }, WATER);
+        if y + 1 < grid.height && grid.get(x, y + 1 ).element_type == ElementType::Nothing {
+            grid.set (x, y + 1, WATER);
         }
     }
 }
