@@ -15,6 +15,7 @@ pub enum ElementType {
     Gas,
     PixelGenerator,
     Nothing,
+    Magic,
 }
 #[derive(Clone, Copy, PartialEq)]
 #[wasm_bindgen]
@@ -54,6 +55,7 @@ impl Element {
             ElementType::Liquid => self.step_liquid(grid,x, y),
             ElementType::Gas => self.step_gas(grid,x, y),
             ElementType::PixelGenerator => self.step_pixel_generator(grid,x, y),
+            ElementType::Magic => self.step_magic(grid,x,y),
             _ => {}
         }
     }
@@ -133,6 +135,29 @@ impl Element {
         }
     }
 
+    fn step_magic(&mut self, grid: &mut Grid, x:usize, y:usize) {
+        let mut offset: (isize, isize) = (0,0);
+        if y > 1 && y < grid.height {
+            let above = grid.get(x,y-1);
+            if above.element_type == ElementType::Nothing || above.element_type == ElementType::Liquid {
+                offset = (0,-1);
+            }
+        }
+        let mut rng = rand::thread_rng();
+        let direction = rng.gen_range(0..2)*2 -1;
+        let new_x: isize = x as isize + direction;
+        if new_x >= 0 && new_x <= (grid.width-1) as isize {
+            let target = grid.get(new_x as usize, (y as isize + offset.1) as usize);
+            if target.element_type == ElementType::Nothing || target.element_type == ElementType::Liquid {
+                offset = (new_x, offset.1);
+            }
+        }
+        let (x2,y2) = (x as isize + offset.0, y as isize + offset.1);
+        let target = grid.get(x2 as usize,y2 as usize);
+        grid.set(x,y,target);
+        grid.set(x2 as usize,y2 as usize,MAGIC);
+    }
+
     fn step_gas(&mut self, grid: &mut Grid, x:usize, y:usize) {
         // Gas simulation logic
     }
@@ -170,5 +195,12 @@ pub static NOTHING: Element = Element {
     element_type: ElementType::Nothing,
     color: Color { r: 0.0, g: 0.0, b: 0.0 },
     name: "Nothing",
+    velocity_x: 0,
+};
+
+pub static MAGIC: Element = Element {
+    element_type: ElementType::Magic,
+    color: Color { r: 0.0, g: 255.0, b: 0.0 },
+    name: "Magic",
     velocity_x: 0,
 };

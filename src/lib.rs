@@ -49,7 +49,7 @@ impl Grid {
             selected_element: element::WATER,
             previous_mouse_x: 0,
             previous_mouse_y: 0,
-            brush_size: 1
+            brush_size: 3
         }
     }
     // Get the element at the given position
@@ -152,10 +152,6 @@ impl Grid {
 
     #[wasm_bindgen]
     pub fn draw_mouse(& mut self, mouse_pos_x: usize, mouse_pos_y: usize) {  
-
-
-
-
         let mut brush_offsets = vec![(0,0)];
 
 
@@ -200,7 +196,7 @@ impl Grid {
             for offset in brush_offsets.iter() {
                 let new_x:usize = (x1 + offset.0) as usize;
                 let new_y = (y1 as isize + offset.1) as usize;
-                if (self.get(new_x,new_y) == element::NOTHING){
+                if (self.get(new_x,new_y) == element::NOTHING || self.selected_element == element::NOTHING){
                     self.set(new_x, new_y, self.selected_element);
                 }
             }
@@ -220,6 +216,8 @@ impl Grid {
             "q" => self.selected_element = element::SAND,
             "w" => self.selected_element = element::WATER,
             "e" => self.selected_element = element::STONE,
+            "r" => self.selected_element = element::MAGIC,
+            "t" => self.selected_element = element::NOTHING,
             "[" => {
                 if self.brush_size > 1 {
                     self.brush_size -= 1;
