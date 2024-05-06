@@ -1,4 +1,4 @@
-import init, { Grid, Vector2, Element } from './pkg/web_based_rust_sandsim.js';
+import init, { Grid } from './pkg/web_based_rust_sandsim.js';
 
 async function run() {
     await init();

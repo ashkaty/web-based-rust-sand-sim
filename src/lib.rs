@@ -14,7 +14,6 @@ pub const GRID_HEIGHT: usize = 126;
 pub struct Vector2 {
     pub x: usize,
     pub y: usize,
-
 }
 
 #[wasm_bindgen]
@@ -52,8 +51,6 @@ impl Grid {
         }
     }
     // Get the element at the given position
-
-    
     pub fn get(&self, pos: Vector2) -> element::Element {
         if pos.x < self.width && pos.y < self.height {
             self.elements[pos.y * self.width + pos.x]
@@ -73,9 +70,7 @@ impl Grid {
         }
     }
 
-    // Move the element at the given position to the new position
-
-   
+    // Move the element at the given position to the new position   
     pub fn move_element(&mut self, pos: Vector2, new_pos: Vector2) {
         let element = self.get(pos);
         self.set(pos, element::NOTHING);
@@ -83,8 +78,6 @@ impl Grid {
     }
 
     // Swap the elements at the given positions
-
-
     pub fn swap_elements(&mut self, pos: Vector2, new_pos: Vector2) {
         let element1 = self.get(pos);
         let element2 = self.get(new_pos);
@@ -93,12 +86,10 @@ impl Grid {
     }
 
     // Update the grid
-
-
     pub fn update(&mut self) {
         for y in (0..self.height).rev() {
             for x in 0..self.width {
-                let element = self.get(Vector2 { x, y });
+                let mut element = self.get(Vector2 { x, y });
                 element.step(self, Vector2 { x, y });
             }
         }
@@ -178,6 +169,9 @@ impl Grid {
             (0, 2), (0, 1), (0, -1), (0, -2),     // Middle vertical
             (1, 2), (1, 1), (1, 0), (1, -1), (1, -2),     // Five points diagonally right
             (2, 0), (2, 1), (2, -1),              // Three points to the right
+            (0,0),                                  // fill center
+        ];
+        let brush_offsets: [(isize, isize); 1] = [
             (0,0),                                  // fill center
         ];
         for point in pointsss{
