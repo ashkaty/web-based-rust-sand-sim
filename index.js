@@ -1,4 +1,4 @@
-import init, { Grid, Vector2, Element } from './pkg/web_based_rust_sandsim.js';
+import init, { Grid } from './pkg/web_based_rust_sandsim.js';
 
 async function run() {
     await init();
@@ -15,39 +15,41 @@ async function run() {
     canvas.width = gridWidth * cellSize;
     canvas.height = gridHeight * cellSize;
 
-    
+    let mouse_down = false;
+    let mouse_pos_x = 0;
+    let mouse_pos_y = 0;
 
-    canvas.addEventListener('click', (event) => {
+    canvas.addEventListener('mousedown', (event) => {
+        mouse_down = true;
         const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((event.clientX - rect.left) / cellSize);
-        const y = Math.floor((event.clientY - rect.top) / cellSize);
-        grid.set(new Vector2(x, y), Element.sand());
+        mouse_pos_x = Math.floor((event.clientX - rect.left) / cellSize);
+        mouse_pos_y = Math.floor((event.clientY - rect.top) / cellSize);
+        grid.set_mouse(mouse_pos_x, mouse_pos_y);
+    });
+    canvas.addEventListener('mousemove', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse_pos_x = Math.floor((event.clientX - rect.left) / cellSize);
+        mouse_pos_y = Math.floor((event.clientY - rect.top) / cellSize);
+    });
+    canvas.addEventListener('mouseup', () => {
+        mouse_down = false;
+    });
+    canvas.addEventListener('keydown', function(event) {
+        // console.log(event.key)
+        grid.handle_input(event.key);
     });
 
+
     function update() {
-
-
-        grid.update();
-
-    
-
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        for (let y = 0; y < gridHeight; y++) {
-            for (let x = 0; x < gridWidth; x++) {
-                const element = grid.get(new Vector2(x, y));
-                // console.log(`${element.to_string()}`)
-                const color = element.get_color();
-                ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
+        if (mouse_down) {
+            grid.draw_mouse(mouse_pos_x, mouse_pos_y);
         }
-
+        grid.render(ctx, 5);
         requestAnimationFrame(update);
     }
 
     update();
 }
 
-document.addEventListener("DOMContentLoaded", run);
+// document.addEventListener("DOMContentLoaded", run);
+run();

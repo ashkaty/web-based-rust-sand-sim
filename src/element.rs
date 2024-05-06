@@ -1,123 +1,155 @@
+use std::path::Display;
+
 use wasm_bindgen::prelude::wasm_bindgen;
 
-
-use crate::element_type::{
-    step_gas, step_immoveable_solid, step_liquid, step_moveable_solid, step_pixel_generator,
-    ElementType,
-};
 use crate::Grid;
-use crate::Vector2;
+use ::rand::{thread_rng, Rng};
+
 
 #[derive(Clone, Copy, PartialEq)]
-
+#[wasm_bindgen]
+pub enum ElementType {
+    ImmovableSolid,
+    MoveableSolid,
+    Liquid,
+    Gas,
+    PixelGenerator,
+    Nothing,
+}
+#[derive(Clone, Copy, PartialEq)]
 #[wasm_bindgen]
 pub struct Color {
     pub r: f32,
     pub g: f32,
     pub b: f32,
 }
-
-
-
-
-
 #[derive(Clone, Copy, PartialEq)]
-
 #[wasm_bindgen]
 pub struct Element {
     pub element_type: ElementType,
     pub color: Color,
     name: &'static str,
+    velocity_x: isize,
 }
 
 #[wasm_bindgen]
 impl Element {
 
-    fn new(element_type: ElementType, color: Color, name: &'static str) -> Element {
-        Element {
-            element_type,
-            color: (color),
-            name,
-        }
-    }
+    // fn new(element_type: ElementType, color: Color, name: &'static str) -> Element {
+    //     Element {
+    //         element_type,
+    //         color: (color),
+    //         name,
+    //         velocity_0,
+    //     }
+    // }
 
-    pub fn step(&self, grid: &mut Grid, pos: Vector2) {
-        if !grid.is_within_bounds(pos) {
+    pub fn step(&mut self, grid: &mut Grid, x:usize, y:usize) {
+        if !grid.is_within_bounds(x, y) {
             return;
         }
         match self.element_type {
-            ElementType::ImmovableSolid => step_immoveable_solid(grid, pos),
-            ElementType::MoveableSolid => step_moveable_solid(grid, pos),
-            ElementType::Liquid => step_liquid(grid, pos, 4),
-            ElementType::Gas => step_gas(grid, pos, 1),
-            ElementType::PixelGenerator => step_pixel_generator(grid, pos),
+            ElementType::ImmovableSolid => self.step_immoveable_solid(grid,x, y),
+            ElementType::MoveableSolid => self.step_moveable_solid(grid,x, y),
+            ElementType::Liquid => self.step_liquid(grid,x, y),
+            ElementType::Gas => self.step_gas(grid,x, y),
+            ElementType::PixelGenerator => self.step_pixel_generator(grid,x, y),
             _ => {}
         }
     }
-    pub fn to_string(&self) -> String {
-        self.name.to_string()
-    }
-    pub fn get_color(&self) -> Color {
-        return self.color;
+
+    fn step_immoveable_solid(&self, grid: &mut Grid, _x:usize, y:usize) {
+        // Immoveable solids don't move, no need for implementation here
     }
 
-    pub fn get_element_type(&self) -> ElementType {
-        return self.element_type;
+    fn step_moveable_solid(&self, grid: &mut Grid, x:usize, y:usize) {
+        // Check if there is space below or liquid to displace
+        if y + 1 < grid.height && (grid.get(x, y + 1 ).element_type == ElementType::Nothing || grid.get(x, y + 1 ).element_type == ElementType::Liquid) {
+            grid.move_element( x,y,x, y + 1 );
+        } else {
+            // Random movement if no space below
+            let mut options = Vec::new();
+            if y + 1 < grid.height && x > 0 && grid.get(x - 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x - 1, y + 1 ));
+            }
+            if y + 1 < grid.height && x + 1 < grid.width && grid.get(x + 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x + 1, y + 1 ));
+            }
+            if !options.is_empty() {
+                let random_index = thread_rng().gen_range(0..options.len());
+                let new_pos = options[random_index];
+                grid.move_element(x, y, new_pos.0, new_pos.1);
+            }
+        }
     }
 
-
-    pub fn sand() -> Element {
-        Element::new(ElementType::MoveableSolid, Color { r: 255.0, g: 215.0, b: 0.0 }, "Sand")
+    fn step_liquid(&mut self, grid: &mut Grid, x:usize, y:usize) {
+        let mut rng = rand::thread_rng();
+        let direction = rng.gen_range(0..2)*2 -1;
+        if y + 1 < grid.height && grid.get(x, y + 1).element_type == ElementType::Nothing {
+            // Random movement if nothing below
+            let mut options = Vec::new();
+            if y + 1 < grid.height && x > 0 && grid.get(x - 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x - 1, y + 1 ));
+            }
+            if y + 1 < grid.height && x > 0 && grid.get(x + 1, y - 1 ).element_type == ElementType::Nothing {
+                options.push((x, y + 1 ));
+            }
+            if y + 1 < grid.height && x + 1 < grid.width && grid.get(x + 1, y + 1 ).element_type == ElementType::Nothing {
+                options.push((x + 1, y + 1 ));
+            }
+            if !options.is_empty() {
+                let random_index = thread_rng().gen_range(0..options.len());
+                let new_pos = options[random_index];
+                grid.move_element(x, y, new_pos.0, new_pos.1);
+            }
+            else {
+                grid.move_element(x, y,x,y+1);
+            }
+        } else {
+            let target_element = grid.get((x as isize + direction) as usize, y);
+            if (target_element.element_type == ElementType::Nothing){
+                grid.move_element(x, y, (x as isize + direction) as usize, y);
+            }
+        }
     }
 
-    pub fn nothing() -> Element {
-        Element::new(ElementType::Nothing, Color{ r: 0.0, g: 0.0, b: 0.0 }, "Nothing")
+    fn step_gas(&mut self, grid: &mut Grid, x:usize, y:usize) {
+        // Gas simulation logic
     }
 
-    pub fn water() -> Element {
-        Element::new(ElementType::Liquid, Color { r: 4.0, g: 59.0, b: 92.0 }, "Water")
+    fn step_pixel_generator(&self, grid: &mut Grid, x:usize, y:usize) {
+        // Check if there is air below
+        if y + 1 < grid.height && grid.get(x, y + 1 ).element_type == ElementType::Nothing {
+            grid.set (x, y + 1, WATER);
+        }
     }
 }
-
-
-pub static AIR: Element = Element {
-    element_type: ElementType::Gas,
-    color: Color{ r: 135.0, g: 206.0, b: 235.0 },
-    name: "Air",
-};
 
 pub static SAND: Element = Element {
     element_type: ElementType::MoveableSolid,
     color: Color { r: 255.0, g: 215.0, b: 0.0 },
     name: "Sand",
+    velocity_x: 0,
 };
 
 pub static WATER: Element = Element {
     element_type: ElementType::Liquid,
     color: Color { r: 4.0, g: 59.0, b: 92.0 },
     name: "Water",
+    velocity_x: 0,
 };
 
 pub static STONE: Element = Element {
     element_type: ElementType::ImmovableSolid,
     color: Color { r: 169.0, g: 169.0, b: 169.0 },
     name: "Stone",
-};
-
-pub static FAUCET: Element = Element {
-    element_type: ElementType::PixelGenerator,
-    color: Color { r: 255.0, g: 255.0, b: 255.0 },
-    name: "Faucet",
-};
-
-pub static CLAY: Element = Element {
-    element_type: ElementType::MoveableSolid,
-    color: Color { r: 165.0, g: 42.0, b: 42.0 },
-    name: "Clay",
+    velocity_x: 0,
 };
 
 pub static NOTHING: Element = Element {
     element_type: ElementType::Nothing,
-    color: Color{ r: 0.0, g: 0.0, b: 0.0 },
+    color: Color { r: 0.0, g: 0.0, b: 0.0 },
     name: "Nothing",
+    velocity_x: 0,
 };
