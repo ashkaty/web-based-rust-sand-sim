@@ -1,7 +1,7 @@
-use element::{Color, Element, WATER};
+use element::*;
 use wasm_bindgen::JsValue;
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
+// use wasm_bindgen::prelude::*;
+// use wasm_bindgen::JsCast;
 use web_sys::CanvasRenderingContext2d;
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::console;
@@ -195,7 +195,7 @@ impl Grid {
             for offset in brush_offsets.iter() {
                 let new_x:usize = (x1 + offset.0) as usize;
                 let new_y = (y1 as isize + offset.1) as usize;
-                if (self.get(new_x,new_y) == element::NOTHING || self.selected_element == element::NOTHING){
+                if self.get(new_x,new_y) == element::NOTHING || self.selected_element == element::NOTHING{
                     self.set(new_x, new_y, self.selected_element);
                 }
             }

@@ -1,4 +1,4 @@
-use std::path::Display;
+// use std::path::Display;
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -50,10 +50,10 @@ impl Element {
             return;
         }
         match self.element_type {
-            ElementType::ImmovableSolid => self.step_immoveable_solid(grid, x, y),
+            ElementType::ImmovableSolid => {},//self.step_immoveable_solid(grid, x, y),
             ElementType::MoveableSolid => self.step_moveable_solid(grid, x, y),
             ElementType::Liquid => self.step_liquid(grid, x, y),
-            ElementType::Gas => self.step_gas(grid, x, y),
+            ElementType::Gas => {},//self.step_gas(grid, x, y),
             ElementType::PixelGenerator => self.step_pixel_generator(grid, x, y),
             ElementType::Magic => self.step_magic(grid, x, y),
             ElementType::Fire => self.step_fire(grid, x, y),
@@ -62,9 +62,9 @@ impl Element {
         }
     }
 
-    fn step_immoveable_solid(&self, grid: &mut Grid, _x: usize, y: usize) {
-        // Immoveable solids don't move, no need for implementation here
-    }
+    // fn step_immoveable_solid(&self, grid: &mut Grid, _x: usize, y: usize) {
+    //     // Immoveable solids don't move, no need for implementation here
+    // }
 
     fn step_moveable_solid(&self, grid: &mut Grid, x: usize, y: usize) {
         // Check if there is space below or liquid to displace
@@ -97,8 +97,6 @@ impl Element {
     }
 
     fn step_liquid(&mut self, grid: &mut Grid, x: usize, y: usize) {
-        let mut rng = rand::thread_rng();
-        let direction = rng.gen_range(0..2) * 2 - 1;
         if y + 1 < grid.height && grid.get(x, y + 1).element_type == ElementType::Nothing {
             // Random movement if nothing below
             let mut options = Vec::new();
@@ -134,7 +132,7 @@ impl Element {
             let direction = rng.gen_range(0..2) * 2 - 1;
             let mut current_x = x;
 
-            for i in 1..=5 {
+            for _i in 0..=5 {
                 let new_x: usize = (current_x as i32 + direction as i32) as usize;
 
                 if new_x < grid.width && new_x > 0 {
@@ -180,9 +178,9 @@ impl Element {
         grid.set(x2 as usize, y2 as usize, MAGIC);
     }
 
-    fn step_gas(&mut self, grid: &mut Grid, x: usize, y: usize) {
-        // Gas simulation logic
-    }
+    // fn step_gas(&mut self, grid: &mut Grid, x: usize, y: usize) {
+    //     // Gas simulation logic
+    // }
 
     fn step_pixel_generator(&self, grid: &mut Grid, x: usize, y: usize) {
         // Check if there is air below
@@ -218,8 +216,6 @@ impl Element {
     }
 
     pub fn step_maze(&mut self, grid: &mut Grid, x: usize, y: usize) {
-        let mut maze_neighbors = 0;
-
         // Check all neighboring cells
         for dx in -1..=1 {
             for dy in -1..=1 {
