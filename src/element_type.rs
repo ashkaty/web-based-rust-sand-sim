@@ -105,9 +105,11 @@ pub fn step_liquid(grid: &mut Grid, pos:Vector2, dispersion_rate: usize) {
         } else {
             // Attempt to disperse left or right
 
-            // let direction = rand::gen_range(0, 2) * 2 - 1;
+            let mut rng = rand::thread_rng();
+            let direction = rng.gen_range(0..2) * 2 - 1; 
+            // generates either 0 or 1, then multiplies by 2 and subtracts 1, resulting in -1 or 1
 
-            let direction = 1 * 2 - 1;
+            // let direction = 1 * 2 - 1;
 
             for i in 1..=dispersion_rate {
                 let new_x = (pos.x as i32 + direction * i as i32) as usize;
