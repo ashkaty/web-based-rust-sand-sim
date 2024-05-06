@@ -31,7 +31,8 @@ pub struct Grid {
     elements: Vec<element::Element>,
     selected_element: element::Element,
     previous_mouse_x: usize,
-    previous_mouse_y: usize
+    previous_mouse_y: usize,
+    brush_size: usize,
 }
 
 
@@ -47,7 +48,8 @@ impl Grid {
             elements: vec![element::NOTHING; width * height],
             selected_element: element::WATER,
             previous_mouse_x: 0,
-            previous_mouse_y: 0
+            previous_mouse_y: 0,
+            brush_size: 1
         }
     }
     // Get the element at the given position
@@ -149,32 +151,50 @@ impl Grid {
     }
 
     #[wasm_bindgen]
-    pub fn draw_mouse(& mut self, mouse_pos_x: usize, mouse_pos_y: usize) {       
-        
-        // const brush_offsets: [(isize, isize); 7] = [
-        //     (0, 0),
-        //     (1, 0),
-        //     (1, 1),
-        //     (0, 1),
-        //     (-1, 0),
-        //     (-1, -1),
-        //     (0, -1),
-        // ];
+    pub fn draw_mouse(& mut self, mouse_pos_x: usize, mouse_pos_y: usize) {  
 
-        let pointsss = self.draw_line(self.previous_mouse_x as isize, self.previous_mouse_y as isize, mouse_pos_x as isize, mouse_pos_y as isize);
 
-        let brush_offsets: [(isize, isize); 21] = [
-            (-2, 0), (-2, 1), (-2, -1),           // Three points to the left
-            (-1, 2), (-1, 1), (-1, 0), (-1, -1), (-1, -2), // Five points diagonally left
-            (0, 2), (0, 1), (0, -1), (0, -2),     // Middle vertical
-            (1, 2), (1, 1), (1, 0), (1, -1), (1, -2),     // Five points diagonally right
-            (2, 0), (2, 1), (2, -1),              // Three points to the right
-            (0,0),                                  // fill center
-        ];
-        let brush_offsets: [(isize, isize); 1] = [
-            (0,0),                                  // fill center
-        ];
-        for point in pointsss{
+
+
+        let mut brush_offsets = vec![(0,0)];
+
+
+        match self.brush_size {
+            2 => {
+                brush_offsets.push((1, 0));
+                brush_offsets.push((1, 1));
+                brush_offsets.push((0, 1));
+                brush_offsets.push((-1, 0));
+                brush_offsets.push((-1, -1));
+                brush_offsets.push((0, -1));},
+            3 => {
+                brush_offsets.push((1, 0));
+                brush_offsets.push((1, 1));
+                brush_offsets.push((0, 1));
+                brush_offsets.push((-1, 0));
+                brush_offsets.push((-1, -1));
+                brush_offsets.push((0, -1));
+                brush_offsets.push((-2, 0));
+                brush_offsets.push((-2, 1));
+                brush_offsets.push((-2, -1));
+                brush_offsets.push((-1, 2));
+                brush_offsets.push((-1, 1));
+                brush_offsets.push((-1, -2));
+                brush_offsets.push((0, 2));
+                brush_offsets.push((0, -1));
+                brush_offsets.push((0, -2));
+                brush_offsets.push((1, 2));
+                brush_offsets.push((1, 0));
+                brush_offsets.push((1, -1));
+                brush_offsets.push((1, -2));
+                brush_offsets.push((2, 0));
+                brush_offsets.push((2, 1));
+                brush_offsets.push((2, -1));
+            },
+            _ => {},
+        }
+        let points_on_line = self.draw_line(self.previous_mouse_x as isize, self.previous_mouse_y as isize, mouse_pos_x as isize, mouse_pos_y as isize);
+        for point in points_on_line{
             let x1 = point.0;
             let y1 = point.1;
             for offset in brush_offsets.iter() {
@@ -187,8 +207,6 @@ impl Grid {
         }
         self.previous_mouse_x = mouse_pos_x;
         self.previous_mouse_y = mouse_pos_y;
-
-
     }
 
     #[wasm_bindgen]
@@ -202,6 +220,16 @@ impl Grid {
             "q" => self.selected_element = element::SAND,
             "w" => self.selected_element = element::WATER,
             "e" => self.selected_element = element::STONE,
+            "[" => {
+                if self.brush_size > 1 {
+                    self.brush_size -= 1;
+                }
+            },
+            "]" => {
+                if self.brush_size < 3{
+                    self.brush_size += 1;
+                }
+            }
             _ => {self.selected_element = element::STONE}
         }
     }

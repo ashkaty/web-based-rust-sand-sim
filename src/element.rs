@@ -107,9 +107,28 @@ impl Element {
                 grid.move_element(x, y,x,y+1);
             }
         } else {
-            let target_element = grid.get((x as isize + direction) as usize, y);
-            if (target_element.element_type == ElementType::Nothing){
-                grid.move_element(x, y, (x as isize + direction) as usize, y);
+            // Attempt to disperse left or right
+
+            let mut rng = rand::thread_rng();
+            let direction = rng.gen_range(0..2) * 2 - 1; 
+            let mut current_x = x;
+
+            for i in 1..=5 {
+                let new_x: usize = (current_x as i32 + direction as i32) as usize;
+
+                if new_x < grid.width && new_x > 0 {
+                    let target = grid.get(new_x, y);
+
+                    if target == NOTHING {
+                        grid.move_element(current_x, y, new_x, y);
+                        current_x = new_x;
+                        //we went sideways! increase velocity if not above max
+                        // break;
+                    }
+                    else{
+                        break;
+                    }
+                }   
             }
         }
     }
