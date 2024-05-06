@@ -40,6 +40,7 @@ pub struct Grid {
     width: usize,
     height: usize,
     elements: Vec<element::Element>,
+    selected_element: element::Element
 }
 
 
@@ -54,6 +55,7 @@ impl Grid {
             width,
             height,
             elements: vec![element::NOTHING; width * height],
+            selected_element: element::Element::water()
         }
     }
     // Get the element at the given position
@@ -159,15 +161,28 @@ impl Grid {
     }
 
     #[wasm_bindgen]
-    pub fn draw_mouse(& mut self, ctx: &CanvasRenderingContext2d, mouse_down: bool, mouse_pos_x: usize, mouse_pos_y: usize) {
-        if mouse_down {
-            self.set(Vector2{x: mouse_pos_x, y: mouse_pos_y}, Element::sand());
+    pub fn draw_mouse(& mut self, ctx: &CanvasRenderingContext2d, mouse_pos_x: usize, mouse_pos_y: usize) {       
+        // const brush_offsets: [(isize, isize); 7] = [
+        //     (0, 0),
+        //     (1, 0),
+        //     (1, 1),
+        //     (0, 1),
+        //     (-1, 0),
+        //     (-1, -1),
+        //     (0, -1),
+        // ];
+
+        let brush_offsets: [(isize, isize); 20] = [
+            (-2, 0), (-2, 1), (-2, -1),           // Three points to the left
+            (-1, 2), (-1, 1), (-1, 0), (-1, -1), (-1, -2), // Five points diagonally left
+            (0, 2), (0, 1), (0, -1), (0, -2),     // Middle vertical
+            (1, 2), (1, 1), (1, 0), (1, -1), (1, -2),     // Five points diagonally right
+            (2, 0), (2, 1), (2, -1)              // Three points to the right
+        ];
+        for offset in brush_offsets.iter() {
+            let new_x = (mouse_pos_x as isize + offset.0) as usize;
+            let new_y = (mouse_pos_y as isize + offset.1) as usize;
+            self.set(Vector2 { x: new_x, y: new_y }, self.selected_element);
         }
-        // self.set(Vector2{mouse_pos_x+1, mouse_pos_y}, Element.sand());
-        // self.set(Vector2{mouse_pos_x+1, mouse_pos_y+1}, Element.sand());
-        // self.set(Vector2{mouse_pos_x, mouse_pos_y+1}, Element.sand());
-        // self.set(Vector2{mouse_pos_x-1, mouse_pos_y}, Element.sand());
-        // self.set(Vector2{mouse_pos_x-1, mouse_pos_y-1}, Element.sand());
-        // self.set(Vector2{mouse_pos_x, mouse_pos_y-1}, Element.sand());
     }
 }

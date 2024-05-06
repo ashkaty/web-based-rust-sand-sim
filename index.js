@@ -35,7 +35,7 @@ async function run() {
 
     function update() {
         if (mouse_down) {
-            grid.draw_mouse(ctx, mouse_down, mouse_pos_x, mouse_pos_y);
+            grid.draw_mouse(ctx, mouse_pos_x, mouse_pos_y);
         }
         grid.render(ctx, 5);
         requestAnimationFrame(update);
