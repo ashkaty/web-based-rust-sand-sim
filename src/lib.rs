@@ -172,7 +172,7 @@ impl Grid {
         //     (0, -1),
         // ];
 
-        let brush_offsets: [(isize, isize); 20] = [
+        let brush_offsets: [(isize, isize); 21] = [
             (-2, 0), (-2, 1), (-2, -1),           // Three points to the left
             (-1, 2), (-1, 1), (-1, 0), (-1, -1), (-1, -2), // Five points diagonally left
             (0, 2), (0, 1), (0, -1), (0, -2),     // Middle vertical
