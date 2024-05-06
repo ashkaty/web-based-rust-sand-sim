@@ -47,7 +47,7 @@ impl Grid {
             width,
             height,
             elements: vec![element::NOTHING; width * height],
-            selected_element: element::Element::water(),
+            selected_element: element::WATER,
             previous_mouse_x: 0,
             previous_mouse_y: 0
         }
@@ -187,7 +187,9 @@ impl Grid {
             for offset in brush_offsets.iter() {
                 let new_x = (x1 as isize + offset.0) as usize;
                 let new_y = (y1 as isize + offset.1) as usize;
-                self.set(Vector2 { x: new_x, y: new_y }, self.selected_element);
+                if (self.get(Vector2{x: new_x, y: new_y}) == element::NOTHING){
+                    self.set(Vector2 { x: new_x, y: new_y }, self.selected_element);
+                }
             }
         }
         self.previous_mouse_x = mouse_pos_x;
@@ -207,9 +209,8 @@ impl Grid {
             "q" => self.selected_element = element::SAND,
             "w" => self.selected_element = element::WATER,
             "e" => self.selected_element = element::STONE,
-            _ => {}
+            _ => {self.selected_element = element::STONE}
         }
     }
 
 }
-

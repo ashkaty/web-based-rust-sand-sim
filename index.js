@@ -35,6 +35,7 @@ async function run() {
         mouse_down = false;
     });
     canvas.addEventListener('keydown', function(event) {
+        // console.log(event.key)
         grid.handle_input(event.key);
     });
 

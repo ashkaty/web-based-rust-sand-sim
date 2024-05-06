@@ -66,17 +66,17 @@ impl Element {
     }
 
 
-    pub fn sand() -> Element {
-        Element::new(ElementType::MoveableSolid, Color { r: 255.0, g: 215.0, b: 0.0 }, "Sand")
-    }
+    // pub fn sand() -> Element {
+    //     Element::new(ElementType::MoveableSolid, Color { r: 255.0, g: 215.0, b: 0.0 }, "Sand")
+    // }
 
-    pub fn nothing() -> Element {
-        Element::new(ElementType::Nothing, Color{ r: 0.0, g: 0.0, b: 0.0 }, "Nothing")
-    }
+    // pub fn nothing() -> Element {
+    //     Element::new(ElementType::Nothing, Color{ r: 0.0, g: 0.0, b: 0.0 }, "Nothing")
+    // }
 
-    pub fn water() -> Element {
-        Element::new(ElementType::Liquid, Color { r: 4.0, g: 59.0, b: 92.0 }, "Water")
-    }
+    // pub fn water() -> Element {
+    //     Element::new(ElementType::Liquid, Color { r: 4.0, g: 59.0, b: 92.0 }, "Water")
+    // }
 }
 
 

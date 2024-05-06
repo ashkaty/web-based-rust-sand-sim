@@ -54,9 +54,9 @@ pub fn step_moveable_solid(grid: &mut Grid, pos: Vector2) {
 }
 
 pub fn step_immoveable_solid(grid: &mut Grid, pos: Vector2) {
-    if pos.y + 1 < GRID_HEIGHT && grid.get(Vector2 { x: pos.x, y: pos.y + 1}) == WATER {
-        grid.swap_elements(Vector2 { x: pos.x, y: pos.y}, Vector2 { x: pos.x, y: pos.y + 1});
-    }
+    // if pos.y + 1 < GRID_HEIGHT && grid.get(Vector2 { x: pos.x, y: pos.y + 1}) == WATER {
+    //     grid.swap_elements(Vector2 { x: pos.x, y: pos.y}, Vector2 { x: pos.x, y: pos.y + 1});
+    // }
 }
 
 pub fn step_gas(grid: &mut Grid, pos:Vector2, diffusion_rate: usize) {
