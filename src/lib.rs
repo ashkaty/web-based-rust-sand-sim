@@ -35,7 +35,6 @@ pub struct Grid {
     brush_size: usize,
 }
 
-
 #[wasm_bindgen]
 impl Grid {
     // Create a new grid with the given width and height
@@ -219,6 +218,7 @@ impl Grid {
             "r" => self.selected_element = element::MAGIC,
             "t" => self.selected_element = element::NOTHING,
             "y" => self.selected_element = element::FIRE,
+            "m" => self.selected_element = element::MAZE,
             "[" => {
                 if self.brush_size > 1 {
                     self.brush_size -= 1;
@@ -229,6 +229,9 @@ impl Grid {
                     self.brush_size += 1;
                 }
             }
+            // "z" => {
+            //     self = &mut Grid::new(self.width, self.height);
+            // }
             _ => {self.selected_element = element::STONE}
         }
     }
