@@ -6,7 +6,6 @@ use web_sys::CanvasRenderingContext2d;
 use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::console;
 mod element;
-mod element_type;
 
 pub const GRID_WIDTH: usize = 226;
 pub const GRID_HEIGHT: usize = 126;
