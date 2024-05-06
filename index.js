@@ -34,6 +34,14 @@ async function run() {
     canvas.addEventListener('mouseup', () => {
         mouse_down = false;
     });
+    canvas.addEventListener('keydown', function(event) {
+        if (event.key === 'q'){
+            grid.update_selected_element(Element.sand());
+        }
+        else if (event.key === 'w'){
+            grid.update_selected_element(Element.water());
+        }
+    });
 
 
     function update() {

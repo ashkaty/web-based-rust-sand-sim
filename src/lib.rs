@@ -194,9 +194,9 @@ impl Grid {
         self.previous_mouse_y = mouse_pos_y;
     }
 
-
     #[wasm_bindgen]
     pub fn draw_mouse(& mut self, mouse_pos_x: usize, mouse_pos_y: usize) {       
+        
         // const brush_offsets: [(isize, isize); 7] = [
         //     (0, 0),
         //     (1, 0),
@@ -231,4 +231,10 @@ impl Grid {
 
 
     }
+
+    #[wasm_bindgen]
+    pub fn update_selected_element(& mut self, e:Element){
+        self.selected_element = e;
+    }
 }
+

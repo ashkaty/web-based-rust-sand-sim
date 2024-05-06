@@ -48,7 +48,7 @@ impl Element {
         match self.element_type {
             ElementType::ImmovableSolid => step_immoveable_solid(grid, pos),
             ElementType::MoveableSolid => step_moveable_solid(grid, pos),
-            ElementType::Liquid => step_liquid(grid, pos, 4),
+            ElementType::Liquid => step_liquid(grid, pos, 8),
             ElementType::Gas => step_gas(grid, pos, 1),
             ElementType::PixelGenerator => step_pixel_generator(grid, pos),
             _ => {}
